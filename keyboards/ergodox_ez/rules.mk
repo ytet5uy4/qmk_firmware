@@ -35,6 +35,7 @@ RGBLIGHT_CUSTOM_DRIVER = yes
 
 RGB_MATRIX_ENABLE = no # enable later
 DEBOUNCE_TYPE = eager_pr
+DYNAMIC_MACRO_ENABLE = yes
 
 # project specific files
 SRC += matrix.c \
