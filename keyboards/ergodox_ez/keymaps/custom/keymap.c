@@ -3,8 +3,30 @@
 
 #define BASE 0 // default layer
 #define FN   3 // function keys
-#define PERMISSIVE_HOLD
-#define IGNORE_MOD_TAP_INTERRUPT
+
+typedef struct {
+  bool is_press_action;
+  int state;
+} tap;
+
+enum {
+  SINGLE_TAP = 1,
+  SINGLE_HOLD = 2,
+  DOUBLE_TAP = 3
+};
+
+enum {
+  XCAPE_LAYER = 0
+};
+
+int cur_dance (qk_tap_dance_state_t *state);
+
+void xl_finished (qk_tap_dance_state_t *state, void *user_data);
+void xl_reset (qk_tap_dance_state_t *state, void *user_data);
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [XCAPE_LAYER] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, xl_finished, xl_reset, 275)
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Keymap 0: Basic layer
@@ -14,7 +36,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+-------------|           |------+------+------+------+------+------+---------|
  * | Tab    |   Q  |   W  |   E  |   R  |   T  |      |           |      |   Y  |   U  |   I  |   O  |   P  |   \     |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+---------|
- * |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |------|           |------|   H  |   J  |   K  |   L  |   ;  |' / Ctrl |
+ * | XCAPE_L|   A  |   S  |   D  |   F  |   G  |------|           |------|   H  |   J  |   K  |   L  |   ;  |' / Ctrl |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+---------|
  * | LSPO   |   Z  |   X  |   C  |   V  |   B  |      |           |      |   N  |   M  |   ,  |   .  |   /  | RSPC    |
  * `--------+------+------+------+------+-------------'           `-------------+------+------+------+------+---------'
@@ -23,21 +45,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                         ,------------.       ,------------.
  *                                         |     |      |       |      |     |
  *                                  ,------|-----|------|       |------+-----+------.
- *                                  |FN/   |     |      |       |      |     |FN/   |
+ *                                  |      |     |      |       |      |     |      |
  *                                  |Space |     |------|       |------|     |Enter |
  *                                  |      |     |      |       |      |     |      |
  *                                  `-------------------'       `------------------x'
  */
 [BASE] = LAYOUT_ergodox(
   // left hand
-  KC_GRV,        KC_1,    KC_2,    KC_3,      KC_4,       KC_5, KC_TRNS,
-  KC_TAB,        KC_Q,    KC_W,    KC_E,      KC_R,       KC_T, KC_TRNS,
-  CTL_T(KC_ESC), KC_A,    KC_S,    KC_D,      KC_F,       KC_G,
-  KC_LSPO,       KC_Z,    KC_X,    KC_C,      KC_V,       KC_B, KC_TRNS,
-  KC_TRNS,       KC_MINS, KC_EQL,  KC_RALT,   KC_LGUI,
-                                                       KC_TRNS, KC_TRNS,
-                                                                KC_TRNS,
-                                       LT(FN, KC_SPC), KC_TRNS, KC_TRNS,
+  KC_GRV,          KC_1,    KC_2,    KC_3,      KC_4,       KC_5, KC_TRNS,
+  KC_TAB,          KC_Q,    KC_W,    KC_E,      KC_R,       KC_T, KC_TRNS,
+  TD(XCAPE_LAYER), KC_A,    KC_S,    KC_D,      KC_F,       KC_G,
+  KC_LSPO,         KC_Z,    KC_X,    KC_C,      KC_V,       KC_B, KC_TRNS,
+  KC_TRNS,         KC_MINS, KC_EQL,  KC_RALT,   KC_LGUI,
+                                                          KC_TRNS, KC_TRNS,
+                                                                   KC_TRNS,
+                                                  KC_SPC, KC_TRNS, KC_TRNS,
   // right hand
   KC_TRNS, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TRNS, KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
@@ -46,7 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            KC_RGUI, KC_LALT, KC_LBRC, KC_RBRC, KC_TRNS,
   KC_TRNS, KC_TRNS,
   KC_TRNS,
-  KC_TRNS, KC_TRNS, LT(FN, KC_ENT)
+  KC_TRNS, KC_TRNS, KC_ENT
 ),
 /* Keymap 1: Function Keys
  *
@@ -55,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+------+------+------+------+------+------|           |------+------+------+------+------+------+--------|
  * |    PLY2 |      |WhDown| MsUp | WhUp |      |      |           |      | WBAK |SCTAB | CTAB | WFWD |      |  RSTP  |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
- * |         | Lclk |MsLeft|MsDown|MsRght| Rclk |------|           |------| Left | Down |  Up  |Right | PSCR |        |
+ * |         |      |MsLeft|MsDown|MsRght|      |------|           |------| Left | Down |  Up  |Right | PSCR |        |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
  * |         |      |      |      |      |      |      |           |      | Home | PgDn | PgUp | End  |      |        |
  * `---------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
@@ -65,7 +87,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                        |      |      |       |      |      |
  *                                 ,------|------|------|       |------+------+------.
  *                                 |      |      |      |       |      |      |      |
- *                                 |      |      |------|       |------|      |      |
+ *                                 | Lclk |      |------|       |------|      | Rclk |
  *                                 |      |      |      |       |      |      |      |
  *                                 `--------------------'       `--------------------'
  */
@@ -73,12 +95,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // left hand
   DM_PLY1, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_TRNS,
   DM_PLY2, KC_TRNS, KC_WH_D, KC_MS_U, KC_WH_U, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_BTN1, KC_MS_L, KC_MS_D, KC_MS_R, KC_BTN2,
+  KC_TRNS, KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_TRNS,
   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
            RESET,   KC_BRID, KC_BRIU, KC_F11,  KC_F12,
                                                KC_TRNS, KC_TRNS,
                                                         KC_TRNS,
-                                      KC_TRNS, KC_TRNS, KC_TRNS,
+                                      KC_BTN1, KC_TRNS, KC_TRNS,
   // right hand
   KC_TRNS, KC_F6,   KC_F7,        KC_F8,     KC_F9,    KC_F10,  KC_DEL,
   KC_TRNS, KC_WBAK, S(C(KC_TAB)), C(KC_TAB), KC_WFWD,  KC_TRNS, DM_RSTP,
@@ -87,7 +109,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
            DM_REC1, DM_REC2,      KC_VOLD,   KC_VOLU,  KC_MUTE,
   KC_TRNS, KC_TRNS,
   KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS
+  KC_TRNS, KC_TRNS, KC_BTN2
 ),
 };
 
@@ -169,3 +191,49 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
   return state;
 };
+
+// Tap Dance
+int cur_dance (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (!state->pressed) {
+      return SINGLE_TAP;
+    } else {
+      return SINGLE_HOLD;
+    }
+  } else if (state->count == 2) {
+    return DOUBLE_TAP;
+  }
+  else return 8;
+}
+
+static tap xl_tap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+void xl_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xl_tap_state.state = cur_dance(state);
+  switch (xl_tap_state.state) {
+    case SINGLE_TAP:
+      tap_code(KC_ESC);
+      break;
+    case SINGLE_HOLD:
+      register_mods(MOD_BIT(KC_LCTL));
+      break;
+    case DOUBLE_TAP:
+      if (layer_state_is(FN)) {
+        layer_off(FN);
+      } else {
+        layer_on(FN);
+      }
+      break;
+  }
+}
+
+void xl_reset (qk_tap_dance_state_t *state, void *user_data) {
+  if (xl_tap_state.state==SINGLE_HOLD) {
+    layer_off(FN);
+  }
+  unregister_mods(MOD_BIT(KC_LCTL));
+  xl_tap_state.state = 0;
+}
