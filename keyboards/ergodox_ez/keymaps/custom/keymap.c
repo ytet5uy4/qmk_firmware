@@ -1,8 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "version.h"
 
-#define BASE 0 // default layer
-#define FN   3 // function keys
+#define INSERT 0 // insert layer
+#define NORMAL 3 // normal layer
+#define VISUAL 6 // visual layer
 
 typedef struct {
   bool is_press_action;
@@ -50,7 +51,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                  |      |     |      |       |      |     |      |
  *                                  `-------------------'       `------------------x'
  */
-[BASE] = LAYOUT_ergodox(
+[INSERT] = LAYOUT_ergodox(
   // left hand
   KC_GRV,          KC_1,    KC_2,    KC_3,      KC_4,       KC_5, KC_TRNS,
   KC_TAB,          KC_Q,    KC_W,    KC_E,      KC_R,       KC_T, KC_TRNS,
@@ -91,25 +92,66 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                 |      |      |      |       |      |      |      |
  *                                 `--------------------'       `--------------------'
  */
-[FN] = LAYOUT_ergodox(
+[NORMAL] = LAYOUT_ergodox(
   // left hand
   DM_PLY1, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_TRNS,
   DM_PLY2, KC_TRNS, KC_WH_D, KC_MS_U, KC_WH_U, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_NO,   KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_TRNS,
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TG(VISUAL), KC_TRNS, KC_TRNS,
            RESET,   KC_BRID, KC_BRIU, KC_F11,  KC_F12,
                                                KC_TRNS, KC_TRNS,
                                                         KC_TRNS,
                                       KC_BTN1, KC_TRNS, KC_TRNS,
   // right hand
   KC_TRNS, KC_F6,   KC_F7,        KC_F8,     KC_F9,    KC_F10,  KC_DEL,
-  KC_TRNS, KC_WBAK, S(C(KC_TAB)), C(KC_TAB), KC_WFWD,  KC_TRNS, DM_RSTP,
+  KC_TRNS, C(KC_C), S(C(KC_TAB)), TG(NORMAL), KC_WFWD,  C(KC_V), DM_RSTP,
            KC_LEFT, KC_DOWN,      KC_UP,     KC_RIGHT, KC_PSCR, KC_TRNS,
   KC_TRNS, KC_HOME, KC_PGDN,      KC_PGUP,   KC_END,   KC_TRNS, KC_TRNS,
            DM_REC1, DM_REC2,      KC_VOLD,   KC_VOLU,  KC_MUTE,
   KC_TRNS, KC_TRNS,
   KC_TRNS,
   KC_TRNS, KC_TRNS, KC_BTN2
+),
+/* Keymap 3: VISUAL layer
+ *
+ * ,---------------------------------------------------.           ,--------------------------------------------------.
+ * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
+ * |---------+------+------+------+------+------+------|           |------+------+------+------+------+------+--------|
+ * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
+ * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
+ * |         |      |      |      |      |      |------|           |------|      |      |      |      |      |        |
+ * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
+ * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
+ * `---------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
+ *   |       |      |      |      |      |                                       |      |      |      |      |      |
+ *   `-----------------------------------'                                       `----------------------------------'
+ *                                        ,-------------.       ,-------------.
+ *                                        |      |      |       |      |      |
+ *                                 ,------|------|------|       |------+------+------.
+ *                                 |      |      |      |       |      |      |      |
+ *                                 |      |      |------|       |------|      |      |
+ *                                 |      |      |      |       |      |      |      |
+ *                                 `--------------------'       `--------------------'
+ */
+[VISUAL] = LAYOUT_ergodox(
+  // left hand
+  KC_NO,      KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO, KC_NO,
+  KC_NO,      KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO, KC_NO,
+  TG(VISUAL), KC_NO,  KC_NO,   C(KC_X), KC_NO, KC_NO,
+  KC_NO,      KC_NO,  C(KC_X), KC_NO,   KC_NO, KC_NO, KC_NO,
+              KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO,
+                                               KC_NO, KC_NO,
+                                                      KC_NO,
+                                        KC_NO, KC_NO, KC_NO,
+  // right hand
+  KC_NO, KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,   KC_NO,
+  KC_NO, C(KC_C),    KC_NO,      KC_NO,    KC_NO,       C(KC_V), KC_NO,
+         S(KC_LEFT), S(KC_DOWN), S(KC_UP), S(KC_RIGHT), KC_NO,   KC_NO,
+  KC_NO, KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,   KC_NO,
+         KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,
+  KC_NO, KC_NO,
+  KC_NO,
+  KC_NO, KC_NO, KC_NO
 ),
 };
 
@@ -221,10 +263,10 @@ void xl_finished (qk_tap_dance_state_t *state, void *user_data) {
       register_mods(MOD_BIT(KC_LCTL));
       break;
     case DOUBLE_TAP:
-      if (layer_state_is(FN)) {
-        layer_off(FN);
+      if (layer_state_is(NORMAL)) {
+        layer_off(NORMAL);
       } else {
-        layer_on(FN);
+        layer_on(NORMAL);
       }
       break;
   }
@@ -232,7 +274,7 @@ void xl_finished (qk_tap_dance_state_t *state, void *user_data) {
 
 void xl_reset (qk_tap_dance_state_t *state, void *user_data) {
   if (xl_tap_state.state==SINGLE_HOLD) {
-    layer_off(FN);
+    layer_off(NORMAL);
   }
   unregister_mods(MOD_BIT(KC_LCTL));
   xl_tap_state.state = 0;
