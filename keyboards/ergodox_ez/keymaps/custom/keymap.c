@@ -4,7 +4,6 @@
 // Layers
 #define INSERT 0
 #define NORMAL 3
-#define VISUAL 6
 #define MOUSE 2
 #define FN 7
 
@@ -16,25 +15,36 @@ typedef struct {
 enum {
   SINGLE_TAP = 1,
   SINGLE_HOLD = 2,
-  DOUBLE_TAP = 3
+  DOUBLE_TAP = 3,
+  DOUBLE_HOLD = 4,
 };
 
 enum {
-  LXCAPE = 0,
-  RXCAPE = 1,
+  TD_XCAPE = 0,
+  TD_QUOT = 1,
+  TD_GUI = 2,
+  TD_ALT = 3,
 };
 
 int cur_dance (qk_tap_dance_state_t *state);
 
-void lx_finished (qk_tap_dance_state_t *state, void *user_data);
-void lx_reset (qk_tap_dance_state_t *state, void *user_data);
+void tdx_finished (qk_tap_dance_state_t *state, void *user_data);
+void tdx_reset (qk_tap_dance_state_t *state, void *user_data);
 
-void rx_finished (qk_tap_dance_state_t *state, void *user_data);
-void rx_reset (qk_tap_dance_state_t *state, void *user_data);
+void tdq_finished (qk_tap_dance_state_t *state, void *user_data);
+void tdq_reset (qk_tap_dance_state_t *state, void *user_data);
+
+void tdg_finished (qk_tap_dance_state_t *state, void *user_data);
+void tdg_reset (qk_tap_dance_state_t *state, void *user_data);
+
+void tda_finished (qk_tap_dance_state_t *state, void *user_data);
+void tda_reset (qk_tap_dance_state_t *state, void *user_data);
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-  [LXCAPE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, lx_finished, lx_reset, 275),
-  [RXCAPE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, rx_finished, rx_reset, 275),
+  [TD_XCAPE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, tdx_finished, tdx_reset, 275),
+  [TD_QUOT] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, tdq_finished, tdq_reset, 275),
+  [TD_GUI] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, tdg_finished, tdg_reset, 275),
+  [TD_ALT] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, tda_finished, tda_reset, 275),
 };
 
 // Macros
@@ -65,7 +75,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 SEND_STRING(
                   SS_UP(X_LSHIFT)
                   SS_UP(X_RSHIFT)
+                  SS_DOWN(X_LCTRL)
+                  SS_DOWN(X_RCTRL)
                   SS_TAP(X_END)
+                  SS_UP(X_LCTRL)
+                  SS_UP(X_RCTRL)
                 );
                 break;
             } else {
@@ -74,7 +88,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
           case VIM_G:
             VIM_LEADER(KC_NO);
-            SEND_STRING(SS_TAP(X_HOME));
+            SEND_STRING(
+                SS_DOWN(X_LCTRL)
+                SS_DOWN(X_RCTRL)
+                SS_TAP(X_HOME)
+                SS_UP(X_LCTRL)
+                SS_UP(X_RCTRL)
+            );
             break;
         }
       }
@@ -121,7 +141,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+-------------|           |------+------+------+------+------+------+---------|
  * | Tab    |   Q  |   W  |   E  |   R  |   T  |      |           |      |   Y  |   U  |   I  |   O  |   P  |   \     |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+---------|
- * | LXCAPE |   A  |   S  |   D  |   F  |   G  |------|           |------|   H  |   J  |   K  |   L  |   ;  | RXCAPE  |
+ * |TD_XCAPE|   A  |   S  |   D  |   F  |   G  |------|           |------|   H  |   J  |   K  |   L  |   ;  | TD_QUOT |
  * |--------+------+------+------+------+------|      |           |      |------+------+------+------+------+---------|
  * | LSPO   |   Z  |   X  |   C  |   V  |   B  |      |           |      |   N  |   M  |   ,  |   .  |   /  | RSPC    |
  * `--------+------+------+------+------+-------------'           `-------------+------+------+------+------+---------'
@@ -137,20 +157,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [INSERT] = LAYOUT_ergodox(
   // left hand
-  KC_GRV,     KC_1,    KC_2,    KC_3,      KC_4,       KC_5, KC_TRNS,
-  KC_TAB,     KC_Q,    KC_W,    KC_E,      KC_R,       KC_T, KC_TRNS,
-  TD(LXCAPE), KC_A,    KC_S,    KC_D,      KC_F,       KC_G,
-  KC_LSPO,    KC_Z,    KC_X,    KC_C,      KC_V,       KC_B, KC_TRNS,
-  MO(FN),     KC_MINS, KC_EQL,  KC_RALT,   KC_LGUI,
-                                                    KC_TRNS, KC_TRNS,
-                                                             KC_TRNS,
-                                            KC_SPC, KC_TRNS, KC_TRNS,
+  KC_GRV,       KC_1,    KC_2,   KC_3,       KC_4,       KC_5, KC_TRNS,
+  KC_TAB,       KC_Q,    KC_W,   KC_E,       KC_R,       KC_T, KC_TRNS,
+  TD(TD_XCAPE), KC_A,    KC_S,   KC_D,       KC_F,       KC_G,
+  KC_LSPO,      KC_Z,    KC_X,   KC_C,       KC_V,       KC_B, KC_TRNS,
+  MO(FN),       KC_MINS, KC_EQL, TD(TD_ALT), TD(TD_GUI),
+                                                      KC_TRNS, KC_TRNS,
+                                                               KC_TRNS,
+                                              KC_SPC, KC_TRNS, KC_TRNS,
   // right hand
-  KC_TRNS, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
-  KC_TRNS, KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
-           KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, TD(RXCAPE),
-  KC_TRNS, KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,
-           KC_RGUI, KC_LALT, KC_LBRC, KC_RBRC, MO(FN),
+  KC_TRNS, KC_6,       KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
+  KC_TRNS, KC_Y,       KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
+           KC_H,       KC_J,   KC_K,    KC_L,    KC_SCLN, TD(TD_QUOT),
+  KC_TRNS, KC_N,       KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,
+           TD(TD_GUI), TD(TD_ALT), KC_LBRC, KC_RBRC, MO(FN),
   KC_TRNS, KC_TRNS,
   KC_TRNS,
   KC_TRNS, KC_TRNS, KC_ENT
@@ -170,29 +190,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_NO, KC_NO,   KC_NO,   KC_NO,      KC_NO,    KC_HOME, KC_NO,
   KC_NO, C(KC_C), KC_NO,   TG(NORMAL), KC_NO,    C(KC_V), KC_NO,
          KC_LEFT, KC_DOWN, KC_UP,      KC_RIGHT, KC_NO,   KC_NO,
-  KC_NO, KC_NO,   KC_NO,   KC_NO,      KC_NO,    KC_NO,   KC_RSFT,
+  KC_NO, KC_NO,   KC_NO,   KC_NO,      KC_NO,    C(KC_F),   KC_RSFT,
          KC_NO,   KC_NO,   KC_NO,      KC_NO,    KC_NO,
-  KC_NO, KC_NO,
-  KC_NO,
-  KC_NO, KC_NO, KC_NO
-),
-// VISUAL layer
-[VISUAL] = LAYOUT_ergodox(
-  // left hand
-  KC_NO,      KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO, KC_NO,
-  KC_NO,      KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO, KC_NO,
-  TG(VISUAL), KC_NO,  KC_NO,   C(KC_X), KC_NO, KC_NO,
-  KC_NO,      KC_NO,  C(KC_X), KC_NO,   KC_NO, KC_NO, KC_NO,
-              KC_NO,  KC_NO,   KC_NO,   KC_NO, KC_NO,
-                                               KC_NO, KC_NO,
-                                                      KC_NO,
-                                        KC_NO, KC_NO, KC_NO,
-  // right hand
-  KC_NO, KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,   KC_NO,
-  KC_NO, C(KC_C),    KC_NO,      KC_NO,    KC_NO,       C(KC_V), KC_NO,
-         S(KC_LEFT), S(KC_DOWN), S(KC_UP), S(KC_RIGHT), KC_NO,   KC_NO,
-  KC_NO, KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,   KC_NO,
-         KC_NO,      KC_NO,      KC_NO,    KC_NO,       KC_NO,
   KC_NO, KC_NO,
   KC_NO,
   KC_NO, KC_NO, KC_NO
@@ -220,23 +219,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [MOUSE] = LAYOUT_ergodox(
   // left hand
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-           KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                               KC_TRNS, KC_TRNS,
-                                                        KC_TRNS,
-                                      KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS,  KC_TRNS, KC_WH_D, KC_MS_U, KC_WH_U, KC_TRNS, KC_TRNS,
+  KC_LCTRL, KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_TRNS,
+  KC_TRNS,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+            KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+                                                KC_TRNS, KC_TRNS,
+                                                         KC_TRNS,
+                                       KC_BTN1, KC_TRNS, KC_TRNS,
   // right hand
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_WH_D, KC_MS_U, KC_WH_U, KC_TRNS, KC_TRNS,
-           KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_BTN2, TG(MOUSE),
-  KC_TRNS, KC_TRNS, KC_PGDN, KC_PGUP, KC_TRNS, KC_TRNS, KC_TRNS,
-           KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS, C(KC_C), KC_TRNS, TG(MOUSE), KC_TRNS, C(KC_V), KC_TRNS,
+           KC_TRNS, KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,
+           KC_TRNS, KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS,
   KC_TRNS, KC_TRNS,
   KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_BTN1
+  KC_TRNS, KC_TRNS, KC_BTN2
 ),
 /* Function layer
  *
@@ -369,20 +368,24 @@ int cur_dance (qk_tap_dance_state_t *state) {
       return SINGLE_HOLD;
     }
   } else if (state->count == 2) {
-    return DOUBLE_TAP;
+    if (!state->pressed) {
+      return DOUBLE_TAP;
+    } else {
+      return DOUBLE_HOLD;
+    }
   }
   else return 8;
 }
 
-// LXCAPE
-static tap lx_tap_state = {
+// TD_XCAPE
+static tap tdx_tap_state = {
   .is_press_action = true,
   .state = 0
 };
 
-void lx_finished (qk_tap_dance_state_t *state, void *user_data) {
-  lx_tap_state.state = cur_dance(state);
-  switch (lx_tap_state.state) {
+void tdx_finished (qk_tap_dance_state_t *state, void *user_data) {
+  tdx_tap_state.state = cur_dance(state);
+  switch (tdx_tap_state.state) {
     case SINGLE_TAP:
       tap_code(KC_ESC);
       break;
@@ -396,26 +399,31 @@ void lx_finished (qk_tap_dance_state_t *state, void *user_data) {
         layer_on(NORMAL);
       }
       break;
+    case DOUBLE_HOLD:
+      register_mods(MOD_BIT(KC_LCTL));
+      register_mods(MOD_BIT(KC_LSHIFT));
+      break;
   }
 }
 
-void lx_reset (qk_tap_dance_state_t *state, void *user_data) {
-  if (lx_tap_state.state==SINGLE_HOLD) {
+void tdx_reset (qk_tap_dance_state_t *state, void *user_data) {
+  if (tdx_tap_state.state==SINGLE_HOLD) {
     layer_off(NORMAL);
   }
   unregister_mods(MOD_BIT(KC_LCTL));
-  lx_tap_state.state = 0;
+  unregister_mods(MOD_BIT(KC_LSHIFT));
+  tdx_tap_state.state = 0;
 }
 
-// RXCAPE
-static tap rx_tap_state = {
+// TD_QUOT
+static tap tdq_tap_state = {
   .is_press_action = true,
   .state = 0
 };
 
-void rx_finished (qk_tap_dance_state_t *state, void *user_data) {
-  rx_tap_state.state = cur_dance(state);
-  switch (rx_tap_state.state) {
+void tdq_finished (qk_tap_dance_state_t *state, void *user_data) {
+  tdq_tap_state.state = cur_dance(state);
+  switch (tdq_tap_state.state) {
     case SINGLE_TAP:
       tap_code(KC_QUOT);
       break;
@@ -429,13 +437,79 @@ void rx_finished (qk_tap_dance_state_t *state, void *user_data) {
         layer_on(MOUSE);
       }
       break;
+    case DOUBLE_HOLD:
+      register_mods(MOD_BIT(KC_RCTL));
+      register_mods(MOD_BIT(KC_RSHIFT));
+      break;
   }
 }
 
-void rx_reset (qk_tap_dance_state_t *state, void *user_data) {
-  if (rx_tap_state.state==SINGLE_HOLD) {
+void tdq_reset (qk_tap_dance_state_t *state, void *user_data) {
+  if (tdq_tap_state.state==SINGLE_HOLD) {
     layer_off(MOUSE);
   }
   unregister_mods(MOD_BIT(KC_RCTL));
-  rx_tap_state.state = 0;
+  unregister_mods(MOD_BIT(KC_RSHIFT));
+  tdq_tap_state.state = 0;
+}
+
+// TD_GUI
+static tap tdg_tap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+void tdg_finished (qk_tap_dance_state_t *state, void *user_data) {
+  tdg_tap_state.state = cur_dance(state);
+  switch (tdg_tap_state.state) {
+    case SINGLE_HOLD:
+      register_mods(MOD_BIT(KC_LGUI));
+      register_mods(MOD_BIT(KC_RGUI));
+      break;
+    case DOUBLE_HOLD:
+      register_mods(MOD_BIT(KC_LGUI));
+      register_mods(MOD_BIT(KC_RGUI));
+      register_mods(MOD_BIT(KC_LSHIFT));
+      register_mods(MOD_BIT(KC_RSHIFT));
+      break;
+  }
+}
+
+void tdg_reset (qk_tap_dance_state_t *state, void *user_data) {
+  clear_oneshot_mods();
+  unregister_mods(MOD_BIT(KC_LGUI));
+  unregister_mods(MOD_BIT(KC_RGUI));
+  unregister_mods(MOD_BIT(KC_LSHIFT));
+  unregister_mods(MOD_BIT(KC_RSHIFT));
+  tdg_tap_state.state = 0;
+}
+
+// TD_ALT
+static tap tda_tap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+void tda_finished (qk_tap_dance_state_t *state, void *user_data) {
+  tda_tap_state.state = cur_dance(state);
+  switch (tda_tap_state.state) {
+    case SINGLE_HOLD:
+      register_mods(MOD_BIT(KC_LALT));
+      register_mods(MOD_BIT(KC_RALT));
+      break;
+    case DOUBLE_HOLD:
+      register_mods(MOD_BIT(KC_LALT));
+      register_mods(MOD_BIT(KC_RALT));
+      register_mods(MOD_BIT(KC_LSHIFT));
+      register_mods(MOD_BIT(KC_RSHIFT));
+      break;
+  }
+}
+
+void tda_reset (qk_tap_dance_state_t *state, void *user_data) {
+  unregister_mods(MOD_BIT(KC_LALT));
+  unregister_mods(MOD_BIT(KC_RALT));
+  unregister_mods(MOD_BIT(KC_LSHIFT));
+  unregister_mods(MOD_BIT(KC_RSHIFT));
+  tda_tap_state.state = 0;
 }
