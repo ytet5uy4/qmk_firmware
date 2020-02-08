@@ -17,6 +17,8 @@ enum {
   SINGLE_HOLD = 2,
   DOUBLE_TAP = 3,
   DOUBLE_HOLD = 4,
+  TRIPLE_TAP = 5,
+  TRIPLE_HOLD = 6,
 };
 
 enum {
@@ -373,6 +375,12 @@ int cur_dance (qk_tap_dance_state_t *state) {
     } else {
       return DOUBLE_HOLD;
     }
+  } else if (state->count == 3) {
+    if (!state->pressed) {
+      return TRIPLE_TAP;
+    } else {
+      return TRIPLE_HOLD;
+    }
   }
   else return 8;
 }
@@ -472,6 +480,16 @@ void tdg_finished (qk_tap_dance_state_t *state, void *user_data) {
       register_mods(MOD_BIT(KC_LSHIFT));
       register_mods(MOD_BIT(KC_RSHIFT));
       break;
+    case TRIPLE_HOLD:
+      register_mods(MOD_BIT(KC_LGUI));
+      register_mods(MOD_BIT(KC_RGUI));
+      register_mods(MOD_BIT(KC_LALT));
+      register_mods(MOD_BIT(KC_RALT));
+      register_mods(MOD_BIT(KC_LCTRL));
+      register_mods(MOD_BIT(KC_RCTRL));
+      register_mods(MOD_BIT(KC_LSHIFT));
+      register_mods(MOD_BIT(KC_RSHIFT));
+      break;
   }
 }
 
@@ -479,6 +497,10 @@ void tdg_reset (qk_tap_dance_state_t *state, void *user_data) {
   clear_oneshot_mods();
   unregister_mods(MOD_BIT(KC_LGUI));
   unregister_mods(MOD_BIT(KC_RGUI));
+  unregister_mods(MOD_BIT(KC_LALT));
+  unregister_mods(MOD_BIT(KC_RALT));
+  unregister_mods(MOD_BIT(KC_LCTRL));
+  unregister_mods(MOD_BIT(KC_RCTRL));
   unregister_mods(MOD_BIT(KC_LSHIFT));
   unregister_mods(MOD_BIT(KC_RSHIFT));
   tdg_tap_state.state = 0;
