@@ -410,6 +410,7 @@ void tdx_finished (qk_tap_dance_state_t *state, void *user_data) {
     case DOUBLE_HOLD:
       register_mods(MOD_BIT(KC_LCTL));
       register_mods(MOD_BIT(KC_LSHIFT));
+      break;
     case TRIPLE_HOLD:
       register_mods(MOD_BIT(KC_LCTL));
       register_mods(MOD_BIT(KC_LSHIFT));
