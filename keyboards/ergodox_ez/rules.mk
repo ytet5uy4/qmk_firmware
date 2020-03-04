@@ -45,3 +45,4 @@ QUANTUM_LIB_SRC += i2c_master.c
 LAYOUTS = ergodox
 
 TAP_DANCE_ENABLE = yes
+AUTO_SHIFT_ENABLE = yes
