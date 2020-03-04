@@ -133,6 +133,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return true;
 };
 
+// Combos
+enum combos {
+  C_F11,
+  C_F12
+};
+
+const uint16_t PROGMEM f11_combo[] = {KC_F10, KC_F1, COMBO_END};
+const uint16_t PROGMEM f12_combo[] = {KC_F10, KC_F2, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {
+  [C_F11] = COMBO(f11_combo, KC_F11),
+  [C_F12] = COMBO(f12_combo, KC_F12)
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Insert Layer
  *
@@ -201,9 +215,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,---------------------------------------------------.           ,--------------------------------------------------.
  * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
  * |---------+------+------+------+------+------+------|           |------+------+------+------+------+------+--------|
- * |         |      |      |      |      |      |      |           |      |      |WhDown| MsUp | WhUp |      |        |
+ * |         |      |WhDown| MsUp | WhUp |      |      |           |      |      |      |      |      |      |        |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
- * |         |      |      |      |      |      |------|           |------|      |MsLeft|MsDown|MsRght| Rclk | Insert |
+ * |         |      |MsLeft|MsDown|MsRght|      |------|           |------|      |      |      |      |      |        |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
  * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
  * `---------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
@@ -213,7 +227,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                                        |      |      |       |      |      |
  *                                 ,------|------|------|       |------+------+------.
  *                                 |      |      |      |       |      |      |      |
- *                                 |      |      |------|       |------|      | Lclk |
+ *                                 | Lclk |      |------|       |------|      | Rclk |
  *                                 |      |      |      |       |      |      |      |
  *                                 `--------------------'       `--------------------'
  */
@@ -240,43 +254,43 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Function layer
  *
  * ,---------------------------------------------------.           ,--------------------------------------------------.
- * |    PLY1 |  F1  |  F2  |  F3  |  F4  |  F5  |      |           |      |  F6  |  F7  |  F8  |  F9  |  F10 |   Del  |
+ * |   RSTP  |  F1  |  F2  |  F3  |  F4  |  F5  |      |           |      |  F6  |  F7  |  F8  |  F9  |  F10 |   Del  |
  * |---------+------+------+------+------+------+------|           |------+------+------+------+------+------+--------|
- * |    PLY2 |      |      |      |      |      |      |           |      |      |      |      |      |      |  RSTP  |
+ * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
- * |         |      |      |      |      |      |------|           |------|      |      |      |      | PSCR |        |
+ * |         |      |      |      |      |      |------|           |------|      |      |      |      |      |        |
  * |---------+------+------+------+------+------|      |           |      |------+------+------+------+------+--------|
  * |         |      |      |      |      |      |      |           |      |      |      |      |      |      |        |
  * `---------+------+------+------+------+-------------'           `-------------+------+------+------+------+--------'
- *   | RESET | BNDN | BNUP |  F11 |  F12 |                                       | REC1 | REC2 | VolDn| VolUp| Mute |
+ *   | RESET | BNDN | BNUP |      |      |                                       |      |      | VolDn| VolUp| Mute |
  *   `-----------------------------------'                                       `----------------------------------'
  *                                        ,-------------.       ,-------------.
  *                                        |      |      |       |      |      |
  *                                 ,------|------|------|       |------+------+------.
- *                                 |      |      |      |       |      |      |      |
+ *                                 |      |      | PLY1 |       | REC1 |      |      |
  *                                 |      |      |------|       |------|      |      |
- *                                 |      |      |      |       |      |      |      |
+ *                                 |      |      | PLY2 |       | REC2 |      |      |
  *                                 `--------------------'       `--------------------'
  */
 [FN] = LAYOUT_ergodox(
   // left hand
-  DM_PLY1, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_TRNS,
-  DM_PLY2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  DM_RSTP, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_TRNS,
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-           RESET,   KC_BRID, KC_BRIU, KC_F11,  KC_F12,
+           RESET,   KC_BRID, KC_BRIU, KC_TRNS, KC_TRNS,
                                                KC_TRNS, KC_TRNS,
-                                                        KC_TRNS,
-                                      KC_TRNS, KC_TRNS, KC_TRNS,
+                                                        DM_PLY1,
+                                      KC_TRNS, KC_TRNS, DM_PLY2,
   // right hand
   KC_TRNS, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_DEL,
-  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, DM_RSTP,
-           KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_PSCR, KC_TRNS,
   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-           DM_REC1, DM_REC2, KC_VOLD, KC_VOLU, KC_MUTE,
+           KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+           KC_TRNS, KC_TRNS, KC_VOLD, KC_VOLU, KC_MUTE,
   KC_TRNS, KC_TRNS,
-  KC_TRNS,
-  KC_TRNS, KC_TRNS, KC_TRNS
+  DM_REC1,
+  DM_REC2, KC_TRNS, KC_TRNS
 ),
 };
 
